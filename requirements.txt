@@ -1,0 +1,9 @@
+requests
+bcrypt
+pybase64
+pandas
+openpyxl
+python-dotenv
+pymysql   # MySQL
+psycopg2  # PostgreSQL
+sqlalchemy
