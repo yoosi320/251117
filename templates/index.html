@@ -3,6 +3,13 @@
 {% block title %}스토어 선택{% endblock %}
 
 {% block content %}
+
+<form method="post" action="/backup-addresses" style="display:inline-block; margin-left: 8px;">
+    <button type="submit">
+        배송지 백업 (BTF + WDS)
+    </button>
+</form>
+
   <h2>스토어 선택</h2>
 
   <form action="/products" method="get" style="margin-bottom: 20px;">

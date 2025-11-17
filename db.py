@@ -10,9 +10,11 @@ from sqlalchemy import (
     Column,
     Integer,
     String,
+    Boolean,
     Text,
     BigInteger,
     DateTime,
+    func,
 )
 from sqlalchemy.orm import declarative_base, sessionmaker
 from datetime import datetime
@@ -77,8 +79,35 @@ class Product(Base):
         }
 
 
+class AddressBook(Base):
+    __tablename__ = "addressbooks"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+    seller_id = Column(String, index=True)   # ex) "BTF", "WDS"
+    mall_id = Column(String, index=True)     # 스토어 ID (필요시)
+
+    address_id = Column(String, index=True)  # 네이버 주소록 ID
+    name = Column(String)                    # 배송지 이름
+    receiver_name = Column(String)           # 받는 사람 이름
+
+    zip_code = Column(String)
+    base_address = Column(String)
+    detail_address = Column(String)
+
+    phone = Column(String)                   # 전화번호
+    mobile = Column(String)                  # 휴대폰
+
+    is_default = Column(Boolean, default=False)
+    usable = Column(Boolean, default=True)
+
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+
 def init_db():
     Base.metadata.create_all(bind=engine)
+
 
 
 def parse_iso_datetime(value: str | None) -> datetime | None:

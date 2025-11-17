@@ -8,12 +8,23 @@ from fastapi.templating import Jinja2Templates
 from naver_commerce.store_manager import StoreManager
 from naver_commerce.product_clone import build_clone_payload_from_channel_product
 from db import init_db, SessionLocal, Product, upsert_products
+from sync_addressbooks_to_db import sync_addressbooks_for_btf_and_wds
 
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
 init_db()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+
 store_manager = StoreManager("config/stores.json")
 
 # ===== 여기부터 추가: 스토어별 배송 설정 =====
@@ -346,3 +357,9 @@ async def clone_product(
         },
         "result": result,  # 네이버 응답 전체
     }
+
+
+@app.post("/backup-addresses")
+def backup_addresses():
+    result = sync_addressbooks_for_btf_and_wds()
+    return JSONResponse({"message": "주소록 백업 완료", "result": result})
