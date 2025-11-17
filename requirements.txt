@@ -7,3 +7,8 @@ python-dotenv
 pymysql   # MySQL
 psycopg2  # PostgreSQL
 sqlalchemy
+fastapi
+uvicorn
+jinja2
+SQLAlchemy
+python-multipart

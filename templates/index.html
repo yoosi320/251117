@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}스토어 선택{% endblock %}
+
+{% block content %}
+  <h2>스토어 선택</h2>
+
+  <form action="/products" method="get" style="margin-bottom: 20px;">
+    <label for="store">스토어:</label>
+    <select name="store" id="store">
+      {% for s in stores %}
+        <option value="{{ s }}">{{ s }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="size">페이지당 개수:</label>
+    <select name="size" id="size">
+      <option value="20">20</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
+
+    <button type="submit">DB에서 상품 보기</button>
+  </form>
+
+  <h3>스토어 데이터 동기화 (네이버 → DB)</h3>
+  <ul>
+    {% for s in stores %}
+      <li>
+        {{ s }} :
+        <a class="button" href="/sync?store={{ s }}">네이버에서 전체 상품 가져와서 DB 저장</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}{{ store }} 상품 목록{% endblock %}
+
+{% block content %}
+  <h2>스토어: {{ store }}</h2>
+  <p>
+    총 상품 수: {{ total_elements }} /
+    현재 페이지: {{ page }} / {{ total_pages }}
+  </p>
+
+  <h3>복제 대상 스토어 선택</h3>
+  <p style="margin-bottom: 8px;">
+    이 페이지에서 선택한 상품들을 아래에서 선택한 스토어로 복제합니다.<br>
+    한 개만 복제할 때도, 체크박스 하나 선택 후 "선택 상품 복제" 버튼을 눌러 주세요.
+  </p>
+
+  <form action="/batch-clone" method="post">
+    <input type="hidden" name="from_store" value="{{ store }}">
+
+    <label for="to_store">타겟 스토어:</label>
+    <select name="to_store" id="to_store">
+      {% for s in stores %}
+        {% if s != store %}
+          <option value="{{ s }}" {% if s == default_target_store %}selected{% endif %}>
+            {{ s }}
+          </option>
+        {% endif %}
+      {% endfor %}
+    </select>
+
+    <table>
+      <thead>
+        <tr>
+          <th>선택</th>
+          <th>ID</th>
+          <th>originProductNo</th>
+          <th>channelProductNo</th>
+          <th>상품명</th>
+          <th>가격(할인가)</th>
+          <th>재고</th>
+          <th>상태</th>
+          <th>카테고리</th>
+          <th>브랜드</th>
+          <th>등록일</th>
+          <th>수정일</th>
+          <th>미리보기</th>
+          <th>세부 JSON</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in rows %}
+          <tr>
+            <td>
+              <input
+                type="checkbox"
+                name="channel_product_no"
+                value="{{ p.channel_product_no }}"
+              >
+            </td>
+            <td>{{ p.id }}</td>
+            <td>{{ p.origin_product_no }}</td>
+            <td>{{ p.channel_product_no }}</td>
+            <td>{{ p.name }}</td>
+            <td>
+              {% if p.discounted_price %}
+                {{ p.discounted_price }}
+              {% else %}
+                {{ p.sale_price }}
+              {% endif %}
+            </td>
+            <td>{{ p.stock_quantity }}</td>
+            <td>{{ p.status }}</td>
+            <td>{{ p.category_name }}</td>
+            <td>{{ p.brand_name }}</td>
+            <td>{{ p.reg_date }}</td>
+            <td>{{ p.modified_date }}</td>
+            <td>
+              <!-- 미리보기: HTML 페이지 -->
+              <a
+                class="button"
+                href="/clone-preview-page?from_store={{ store }}&to_store={{ default_target_store }}&channel_product_no={{ p.channel_product_no }}"
+                target="_blank"
+              >
+                미리보기
+              </a>
+
+            </td>
+            <td>
+              <details>
+                <summary>보기</summary>
+                <pre style="max-width:400px; max-height:200px; overflow:auto; white-space:pre-wrap;">
+{{ p.raw_json }}
+                </pre>
+              </details>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div style="margin-top: 10px;">
+      <button type="submit" class="button">선택 상품 복제</button>
+    </div>
+  </form>
+
+  <div class="pagination">
+    {% if page > 1 %}
+      <a class="button"
+         href="/products?store={{ store }}&size={{ size }}&page={{ page - 1 }}">이전</a>
+    {% endif %}
+    {% if page < total_pages %}
+      <a class="button"
+         href="/products?store={{ store }}&size={{ size }}&page={{ page + 1 }}">다음</a>
+    {% endif %}
+  </div>
+{% endblock %}

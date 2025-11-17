@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}상품 복사 결과{% endblock %}
+
+{% block content %}
+  <h2>상품 복사 결과</h2>
+
+  <p>원본 스토어: {{ source_store }}</p>
+  <p>대상 스토어: {{ target_store }}</p>
+  <p>originProductNo: {{ origin_product_no }}</p>
+
+  <h3>네이버 API 응답</h3>
+  <pre style="max-width:800px; max-height:300px; overflow:auto; white-space:pre-wrap;">
+{{ api_result }}
+  </pre>
+
+  <h3>전송한 payload</h3>
+  <pre style="max-width:800px; max-height:300px; overflow:auto; white-space:pre-wrap;">
+{{ payload }}
+  </pre>
+{% endblock %}

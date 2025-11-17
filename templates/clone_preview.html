@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}복제 미리보기: {{ from_store }} → {{ to_store }}{% endblock %}
+
+{% block content %}
+  <h2>복제 미리보기</h2>
+  <p>
+    From: <strong>{{ from_store }}</strong><br>
+    To: <strong>{{ to_store }}</strong><br>
+    channelProductNo: <strong>{{ channel_product_no }}</strong>
+  </p>
+
+  <h3>originProduct 요약</h3>
+  <ul>
+    <li>상품명: {{ origin.name }}</li>
+    <li>카테고리 ID: {{ origin.categoryId }}</li>
+    <li>브랜드: {{ origin.brandName }}</li>
+  </ul>
+
+  <h4>originProduct 전체 JSON</h4>
+  <pre style="max-width: 100%; max-height: 300px; overflow:auto; white-space:pre-wrap;">
+{{ origin_json }}
+  </pre>
+
+  <h4>smartstoreChannelProduct JSON</h4>
+  <pre style="max-width: 100%; max-height: 300px; overflow:auto; white-space:pre-wrap;">
+{{ smart_json }}
+  </pre>
+
+  <p style="margin-top: 16px;">
+    이 상품을 바로 복제하려면, 아래 버튼 대신<br>
+    상품 목록에서 체크박스를 선택하고 "선택 상품 복제"를 눌러도 됩니다.
+  </p>
+
+  <p>
+    <a class="button" href="/products?store={{ from_store }}">상품 목록으로 돌아가기</a>
+  </p>
+{% endblock %}

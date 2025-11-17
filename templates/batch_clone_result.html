@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}배치 복제 결과{% endblock %}
+
+{% block content %}
+  <h2>배치 복제 결과</h2>
+  <p>
+    From: <strong>{{ from_store }}</strong><br>
+    To: <strong>{{ to_store }}</strong>
+  </p>
+
+  {% if message %}
+    <p><strong>{{ message }}</strong></p>
+  {% endif %}
+
+  {% if results %}
+    <table>
+      <thead>
+        <tr>
+          <th>channelProductNo (원본)</th>
+          <th>결과</th>
+          <th>메시지</th>
+          <th>네이버 응답(JSON)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+          <tr>
+            <td>{{ r.channel_product_no }}</td>
+            <td>
+              {% if r.success %}
+                ✅ 성공
+              {% else %}
+                ❌ 실패
+              {% endif %}
+            </td>
+            <td>{{ r.error }}</td>
+            <td>
+              {% if r.result_json %}
+                <details>
+                  <summary>보기</summary>
+                  <pre style="max-width:400px; max-height:200px; overflow:auto; white-space:pre-wrap;">
+{{ r.result_json }}
+                  </pre>
+                </details>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+
+  <p style="margin-top: 16px;">
+    <a class="button" href="/products?store={{ from_store }}">상품 목록으로 돌아가기</a>
+  </p>
+{% endblock %}
