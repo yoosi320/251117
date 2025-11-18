@@ -20,9 +20,11 @@ def main():
         "fromDate": "2000-01-01",
         "toDate": "2099-12-31",
     }
-
+    client.test()
+    #print(products.text)
     products = client.search_products(request_body)
-
+    
+    
     print(f"\n[{store_name}] 상품 조회 결과:")
 
     contents = products.get("contents", [])

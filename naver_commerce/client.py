@@ -6,11 +6,19 @@ from typing import Any, Dict, Optional, List
 import requests
 
 from .auth import NaverCommerceAuth
-
+# services/address_book.py
+from sqlalchemy.orm import Session
+from db import AddressBook
 
 BASE_URL = "https://api.commerce.naver.com"
-ADDRESSBOOK_LIST_PATH = "/v1/seller/addressbooks-for-page"
+ADDRESSBOOK_LIST_PATH = "/external/v1/seller/addressbooks-for-page"
+url = "https://api.commerce.naver.com/external/v1/seller/addressbooks-for-page"
 
+payload = {}
+headers = {
+  'Accept': 'application/json',
+  'Authorization': 'Bearer <token>'
+}
 
 class NaverCommerceClient:
     """
@@ -102,67 +110,75 @@ class NaverCommerceClient:
             json_body=payload,
         )
     
+    def get_addressbooks_page(
+        self,   
+        store_name: str,
+        page: int = 1,
+        size: int = 100,
+    ) -> dict:
+        params = {
+            "page": page,
+            "size": size,
+        }
 
-#AddressBook
-def get_addressbooks(
-    store: Any,
-    page: int = 0,
-    size: int = 100,
-    ) -> Dict[str, Any]:
-    """
-    단일 페이지의 주소록 목록을 가져온다.
-    - store : store_manager에서 가져온 스토어 객체(BTF, WDS 등)
-    - page  : 0부터 시작하는 페이지 번호
-    - size  : 페이지당 개수
-    """
-    params = {
-        "page": page,
-        "size": size,
-    }
+    # _request가 (method, path)만 받는 구조라서,
+    # 쿼리스트링을 path에 직접 붙이는 방식으로 처리
+        path = f"{ADDRESSBOOK_LIST_PATH}?page={page}"
 
-    # ✅ 이 부분은 "상품 조회"에서 사용하는 호출 방식과 동일하게 맞춰줘
-    resp = api_request(
-#            store=store,   #yoosi
-        method="GET",
-        path=ADDRESSBOOK_LIST_PATH,
-        params=params,
-    )
-    return resp
+    # ✅ 여기서 _request는 기존 다른 메서드들처럼 이렇게만 호출
+        return self._request("GET", path)
 
+    def get_all_addressbooks(
+        self,
+        store_name: str,
+        page_size: int = 100,
+    ) -> list[dict]:
+        all_items: list[dict] = []
+        page = 1
 
-def get_all_addressbooks(store: Any, page_size: int = 100) -> List[Dict[str, Any]]:
-    """
-    페이징을 돌면서 해당 스토어의 모든 주소록을 리스트로 모아 준다.
-    - 네이버 응답 JSON에 last / hasNext / totalPages 같은 필드가 있으면
-    그걸 이용해서 반복 종료.
-    """
-    all_items: List[Dict[str, Any]] = []
-    page = 0
+        while True:
+            print("test1")
+            data = self.get_addressbooks_page(store_name, page=page, size=page_size)
+            contents = (
+                data.get("contents")
+                or data.get("data", {}).get("contents")
+                or []
+            )
+            all_items.extend(data.get("addressBooks"))
 
-    while True:
-        data = get_addressbooks(store, page=page, size=page_size)
-
-        contents = data.get("contents") or data.get("data", {}).get("contents") or []
-        all_items.extend(contents)
-
-        # 페이징 종료 조건은 실제 응답 구조에 맞게 조정
-        last = data.get("last")
-        total_pages = data.get("totalPages")
-        has_next = data.get("hasNext")
-
-        if last is True:
-            break
-        if total_pages is not None and page + 1 >= total_pages:
-            break
-        if has_next is False:
-            break
-
-        # 위 조건들이 전혀 없으면, contents 개수로 끝 판단(임시)
-        if not contents or len(contents) < page_size:
-            break
-
-        page += 1
-
-    return all_items
+          # 페이징 종료 조건 (응답 구조에 맞게 조정)
+            last = data.get("last")
+            total_pages = data.get("totalPage")
+            has_next = data.get("hasNext")
 
 
+
+
+#            if last is True:
+ #               break
+            if page >= total_pages:
+                break
+            #if has_next is False:
+            #    break
+  #          if not contents or len(contents) < page_size:
+   #             break
+
+            page += 1
+
+        return all_items
+    
+    def test(self):
+        print("test")
+        response = self._request(
+            "GET",
+            "/external/v1/seller/addressbooks-for-page?page=2",
+        )
+        print("test2")
+        print(response)
+
+
+
+        
+
+
+    

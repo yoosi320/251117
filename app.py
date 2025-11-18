@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 from typing import List
 
 from fastapi import FastAPI, Request, Query, HTTPException, Form
@@ -7,8 +8,7 @@ from fastapi.templating import Jinja2Templates
 
 from naver_commerce.store_manager import StoreManager
 from naver_commerce.product_clone import build_clone_payload_from_channel_product
-from db import init_db, SessionLocal, Product, upsert_products
-from sync_addressbooks_to_db import sync_addressbooks_for_btf_and_wds
+from db import init_db, SessionLocal, Product, upsert_products, AddressBook
 
 
 app = FastAPI()
@@ -83,6 +83,8 @@ async def view_products(
     try:
         base_query = (
             session.query(Product)
+            .filter(~Product.category_name.contains("로봇"))
+            .filter(~Product.category_name.contains("RC"))
             .filter(Product.store == store)
             .order_by(Product.origin_product_no.desc())
         )
@@ -361,5 +363,46 @@ async def clone_product(
 
 @app.post("/backup-addresses")
 def backup_addresses():
-    result = sync_addressbooks_for_btf_and_wds()
-    return JSONResponse({"message": "주소록 백업 완료", "result": result})
+    manager = StoreManager("config/stores.json")
+    store_name = "WDS"   # 또는 "WDS"
+    client = manager.get_client(store_name)
+    items = client.get_all_addressbooks(store_name)
+    df = pd.DataFrame(items)
+    df.set_index('addressBookNo',inplace=True)
+    df.to_excel("./WDS_After2.xlsx")
+
+
+    db = SessionLocal()
+    for item in items:
+        address_book_no = item["addressBookNo"]
+        
+
+        # 이미 있는지 확인 (있으면 업데이트, 없으면 신규 생성)
+        obj = db.query(AddressBook).filter(
+            AddressBook.addressBookNo == address_book_no
+        ).first()
+
+        if obj is None:
+            obj = AddressBook(addressBookNo=address_book_no)
+            db.add(obj)
+
+        # 공통 필드 매핑
+        obj.name = item.get("name")
+        obj.addressType = item.get("addressType")
+        obj.postalCode = item.get("postalCode")
+        obj.baseAddress = item.get("baseAddress")
+        obj.detailAddress = item.get("detailAddress")
+        obj.address = item.get("address")
+
+        obj.phoneNumber1 = item.get("phoneNumber1")
+        obj.phoneNumber2 = item.get("phoneNumber2")
+
+        obj.hasLocation = item.get("hasLocation")
+        obj.roadNameAddress = item.get("roadNameAddress")
+        obj.overseasAddress = item.get("overseasAddress")
+
+    db.commit()
+
+
+    #result = sync_addressbooks_for_btf_and_wds()
+    return JSONResponse({"message": "주소록 백업 완료", "result": store_name})

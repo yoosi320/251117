@@ -11,7 +11,7 @@ from naver_commerce.store_manager import StoreManager
 #from store_manager import store_manager        # 예: store_manager.get_store("BTF")
 
 #from naver_commerce.client import NaverCommerceClient
-from naver_commerce.client import get_all_addressbooks
+#from naver_commerce.client import get_all_addressbooks
 
 manager = StoreManager("config/stores.json")
 

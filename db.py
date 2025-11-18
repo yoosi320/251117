@@ -79,30 +79,49 @@ class Product(Base):
         }
 
 
+
 class AddressBook(Base):
-    __tablename__ = "addressbooks"
+    __tablename__ = "address_books"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    # 네이버 주소록 고유번호
+    addressBookNo = Column(Integer, primary_key=True, index=True)
 
-    seller_id = Column(String, index=True)   # ex) "BTF", "WDS"
-    mall_id = Column(String, index=True)     # 스토어 ID (필요시)
+    # API 필드 매핑
+    name = Column(String(200))           # name
+    addressType = Column(String(50))     # addressType (RELEASE / REFUND_OR_EXCHANGE / GENERAL 등)
+    postalCode = Column(String(20))      # postalCode
+    baseAddress = Column(String(200))    # baseAddress
+    detailAddress = Column(String(200))  # detailAddress
+    address = Column(String(300))        # address (전체 주소 문자열)
 
-    address_id = Column(String, index=True)  # 네이버 주소록 ID
-    name = Column(String)                    # 배송지 이름
-    receiver_name = Column(String)           # 받는 사람 이름
+    phoneNumber1 = Column(String(50))    # phoneNumber1
+    phoneNumber2 = Column(String(50))    # phoneNumber2
 
-    zip_code = Column(String)
-    base_address = Column(String)
-    detail_address = Column(String)
+    hasLocation = Column(Boolean)        # hasLocation
+    roadNameAddress = Column(Boolean)    # roadNameAddress
+    overseasAddress = Column(Boolean)    # overseasAddress
 
-    phone = Column(String)                   # 전화번호
-    mobile = Column(String)                  # 휴대폰
 
-    is_default = Column(Boolean, default=False)
-    usable = Column(Boolean, default=True)
+class codeMapping(Base):
+    __tablename__ = "codeMapping"
 
-    created_at = Column(DateTime, server_default=func.now())
-    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+    # 네이버 주소록 고유번호
+    id = Column(Integer, primary_key=True, index=True)
+
+    # API 필드 매핑
+    store = Column(String(200))           # name
+    addressType = Column(String(50))     # addressType (RELEASE / REFUND_OR_EXCHANGE / GENERAL 등)
+    postalCode = Column(String(20))      # postalCode
+    baseAddress = Column(String(200))    # baseAddress
+    detailAddress = Column(String(200))  # detailAddress
+    address = Column(String(300))        # address (전체 주소 문자열)
+
+    phoneNumber1 = Column(String(50))    # phoneNumber1
+    phoneNumber2 = Column(String(50))    # phoneNumber2
+
+    hasLocation = Column(Boolean)        # hasLocation
+    roadNameAddress = Column(Boolean)    # roadNameAddress
+    overseasAddress = Column(Boolean)    # overseasAddress
 
 
 def init_db():

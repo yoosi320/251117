@@ -76,6 +76,8 @@ def build_clone_payload_from_channel_product(
 
 
 
+
+
 # 1-1) 추가상품(supplementProducts) 내부 id 제거
     # A 스토어의 내부 id는 B 스토어 신규 상품 등록 시 사용하면 안 됨
     detail_attr = origin.get("detailAttribute") or {}
